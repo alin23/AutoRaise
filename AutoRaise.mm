@@ -48,6 +48,7 @@ extern "C" CGError CGSGetCursorScale(CGSConnectionID connectionId, float *scale)
 extern "C" AXError _AXUIElementGetWindow(AXUIElementRef, CGWindowID *out);
 // Above methods are undocumented and subjective to incompatible changes
 
+static NSScreen * previousScreen = NULL;
 static char pathBuffer[PROC_PIDPATHINFO_MAXSIZE];
 static bool activated_by_task_switcher = false;
 static AXUIElementRef _accessibility_object = AXUIElementCreateSystemWide();
@@ -306,6 +307,20 @@ bool inline desktop_window(AXUIElementRef _window) {
 
     if (verbose && desktop_window) { NSLog(@"desktop window"); }
     return desktop_window;
+}
+
+bool screenChanged(CGPoint point) {
+    bool changed = false;
+    for (NSScreen * screen in [NSScreen screens]) {
+        if (NSPointInRect(NSPointFromCGPoint(point), screen.frame)) {
+            changed = previousScreen != screen;
+            previousScreen = screen;
+            break;
+        }
+    }
+
+    if (verbose && changed) { NSLog(@"screen changed"); }
+    return changed;
 }
 
 //-----------------------------------------------notifications----------------------------------------------
@@ -637,6 +652,13 @@ void onTick() {
     if (mouseMoved || delayTicks || raiseTimes) {
         AXUIElementRef _mouseWindow = get_mousewindow(mousePoint);
         if (_mouseWindow) {
+            if ((raiseTimes || delayCount == 1 || delayTicks == 1) &&
+                !desktop_window(_mouseWindow) && !screenChanged(mousePoint)) {
+                CFRelease(_mouseWindow);
+                raiseTimes = 0;
+                delayTicks = 0;
+                return;
+            }
             pid_t mouseWindow_pid;
             if (AXUIElementGetPid(_mouseWindow, &mouseWindow_pid) == kAXErrorSuccess) {
                 Boolean needs_raise = true;
