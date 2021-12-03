@@ -691,13 +691,17 @@ void onTick() {
 
 CGEventRef eventTapHandler(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *userInfo) {
     static bool commandTabPressed = false;
+    static bool rcmdPressed = false;
     activated_by_task_switcher = activated_by_task_switcher ||
-        (type == kCGEventFlagsChanged && commandTabPressed);
+        (type == kCGEventFlagsChanged && commandTabPressed) || rcmdPressed;
     commandTabPressed = false;
+    rcmdPressed = false;
     if (type == kCGEventKeyDown) {
+        CGEventFlags flags = CGEventGetFlags(event);
+        rcmdPressed = (flags & NX_DEVICERCMDKEYMASK) == NX_DEVICERCMDKEYMASK;
+
         CGKeyCode keycode = (CGKeyCode) CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
         if (keycode == kVK_Tab) {
-            CGEventFlags flags = CGEventGetFlags(event);
             commandTabPressed = (flags & kCGEventFlagMaskCommand) == kCGEventFlagMaskCommand;
         }
     }
