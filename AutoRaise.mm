@@ -373,11 +373,11 @@ void onTick();
 
     if (verbose) { NSLog(@"Set cursor scale: %@", scale); }
     float nextScale = scale.floatValue;
-    float step = prevScale < nextScale ? 0.1 : -0.1;
-    for (float i = prevScale; abs(i - nextScale) > 0.12; i += step)
+    float step = prevScale < nextScale ? 0.05 : -0.05;
+    for (float i = prevScale; abs(i - nextScale) > 0.06; i += step)
     {
         CGSSetCursorScale(CGSMainConnectionID(), i);
-        [NSThread sleepForTimeInterval:0.005];
+        [NSThread sleepForTimeInterval:0.0025];
     }
     CGSSetCursorScale(CGSMainConnectionID(), scale.floatValue);
 }
