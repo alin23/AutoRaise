@@ -38,8 +38,8 @@
 // find the latest focused (main)window. This value should be kept as low as possible.
 #define ACTIVATE_DELAY_MS 10
 
-#define SCALE_DELAY_MS 400 // The moment the mouse scaling should start, feel free to modify.
-#define SCALE_DURATION_MS (SCALE_DELAY_MS+600) // Mouse scale duration, feel free to modify.
+#define SCALE_DELAY_MS 60 // The moment the mouse scaling should start, feel free to modify.
+#define SCALE_DURATION_MS (SCALE_DELAY_MS+100) // Mouse scale duration, feel free to modify.
 
 typedef int CGSConnectionID;
 extern "C" CGSConnectionID CGSMainConnectionID(void);
@@ -368,7 +368,17 @@ void onTick();
 }
 
 - (void)onSetCursorScale:(NSNumber *)scale {
+    static float prevScale = oldScale;
+    CGSGetCursorScale(CGSMainConnectionID(), &prevScale);
+
     if (verbose) { NSLog(@"Set cursor scale: %@", scale); }
+    float nextScale = scale.floatValue;
+    float step = prevScale < nextScale ? 0.1 : -0.1;
+    for (float i = prevScale; abs(i - nextScale) > 0.12; i += step)
+    {
+        CGSSetCursorScale(CGSMainConnectionID(), i);
+        [NSThread sleepForTimeInterval:0.005];
+    }
     CGSSetCursorScale(CGSMainConnectionID(), scale.floatValue);
 }
 

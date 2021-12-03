@@ -1,3 +1,15 @@
+# AutoRaise
+
+## Installation
+
+```sh
+brew tap alin23/autoraise
+brew install autoraise
+brew services start autoraise
+```
+
+## Description
+
 When you hover a window it will be raised to the front (with a delay of your choosing) and gets the focus. There is also an
 option to warp the mouse to the center of the activated window when using the cmd-tab key combination. See also
 https://stackoverflow.com/questions/98310/focus-follows-mouse-plus-auto-raise-on-mac-os-x
@@ -35,7 +47,7 @@ disables warp and defaults to 40ms delay. To pass the command line parameters by
     #AutoRaise config file
     delay=1 
     warpX=0.5
-    warpY=0.1
+    warpY=0.5
     scale=2.5
 
 **AutoRaise.app usage:**
@@ -93,11 +105,3 @@ The output should look something like this:
     2021-07-28 19:07:45.922 AutoRaise[978:9295] Registered app activated selector
     ...
     ...
-
-*Note1*: Dimentium created a homebrew formula for this tool which can be found here:
-
-https://github.com/Dimentium/homebrew-autoraise
-
-*Note2*: Lothar Haeger created a gui on top of the command line version which can be found here:
-
-https://github.com/lhaeger/AutoRaise
